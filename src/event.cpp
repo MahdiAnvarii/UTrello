@@ -1,0 +1,115 @@
+#include "event.h"
+
+Event::Event(shared_ptr<Date> eventDate_, int eventCounter_, int start_time_, int duration_, string title_, string description_):
+                    eventDate(eventDate_) {
+    eventID = eventCounter_;
+    start_time = start_time_;
+    duration = duration_; 
+    title = title_;
+    description = description_;
+}
+
+shared_ptr<Date> Event::getEventDate() const { return eventDate; }
+int Event::getEventStartTime() const { return start_time; }
+int Event::getEventDuration() const { return duration; }
+int Event::getEventID() const { return eventID; }
+
+void Event::reportEvent(){
+    cout << "event \"" << title << "\" on " << eventDate->createDateLine() << " from " << start_time 
+    << " for " << duration << " hours:";
+    if (description != EMPTY_DESCRIPTION) cout << " \""<< description << "\"" << endl;
+    else cout << endl;
+}
+
+void sortEvents(vector<shared_ptr<Event>>& events){
+    sort(events.begin(), events.end(), [](const shared_ptr<Event> a, const shared_ptr<Event> b) {
+        if (a->getEventDate()->getYear() != b->getEventDate()->getYear()) {
+            return a->getEventDate()->getYear() < b->getEventDate()->getYear();
+        }
+        if (a->getEventDate()->getMonth() != b->getEventDate()->getMonth()) {
+            return a->getEventDate()->getMonth() < b->getEventDate()->getMonth();
+        }
+        if (a->getEventDate()->getDay() != b->getEventDate()->getDay()) {
+            return a->getEventDate()->getDay() < b->getEventDate()->getDay();
+        }
+        if (a->getEventStartTime() != b->getEventStartTime()) {
+            return a->getEventStartTime() < b->getEventStartTime();
+        }
+        return a->getEventID() < b->getEventID();
+    });
+}
+
+
+PeriodicEvent::PeriodicEvent(vector<shared_ptr<Date>> periodicEventDates_, int periodicEventCounter_, int start_time_, int duration_, 
+                                PeriodicType periodicType_, string title_, string description_) :
+                                periodicEventDates(periodicEventDates_), periodicType(periodicType_) {
+    periodicEventID = periodicEventCounter_;
+    start_time = start_time_; 
+    duration = duration_; 
+    title = title_;
+    description = description_;
+}
+
+vector<shared_ptr<Date>> PeriodicEvent::getPeriodicEventDates() const { return periodicEventDates; }
+int PeriodicEvent::getPeriodicEventStartTime() const { return start_time; }
+int PeriodicEvent::getPeriodicEventDuration() const { return duration; }
+int PeriodicEvent::getPeriodicEventID() const { return periodicEventID; }
+
+void PeriodicEvent::reportPeriodicEvent(shared_ptr<Date> periodicEventDate){
+    cout << "periodic_event \"" << title << "\" on " << periodicEventDate->createDateLine() << " from " << start_time 
+    << " for " << duration << " hours " << periodicTypeToString(periodicType) << ":";
+    if (description != EMPTY_DESCRIPTION) cout << " \""<< description << "\"" << endl;
+    else cout << endl;
+}
+
+void sortPeriodicEvents(vector<shared_ptr<PeriodicEvent>>& periodicEvents){
+    sort(periodicEvents.begin(), periodicEvents.end(), [](const shared_ptr<PeriodicEvent> a, const shared_ptr<PeriodicEvent> b) {
+        if (a->getPeriodicEventStartTime() != b->getPeriodicEventStartTime()) {
+            return a->getPeriodicEventStartTime() < b->getPeriodicEventStartTime();
+        }
+        return a->getPeriodicEventID() < b->getPeriodicEventID();
+    });
+}
+
+
+Task::Task(shared_ptr<Date> taskDate_, int taskCounter_, int time_, string title_, string description_):
+                    taskDate(taskDate_) {
+    taskID = taskCounter_;
+    time = time_;
+    title = title_;
+    description = description_;
+}
+
+void Task::editTask(string dateLine_, int time_, string title_, string description_){
+    if (time_ != DEFUALT_INTEGER) time = time_;
+    if (title_ != EMPTY_TITLE) title = title_;
+    if (description_ != EMPTY_DESCRIPTION) description = description_;
+    if (dateLine_ != EMPTY_DATELINE) {
+        shared_ptr<Date> taskDate_ = make_shared<Date>(dateLine_);
+        taskDate = taskDate_;
+    }
+}
+
+shared_ptr<Date> Task::getTaskDate() const { return taskDate; }
+int Task::getTaskID() const { return taskID; }
+
+void Task::reportTask(){
+    cout << "task \"" << title << "\" on " << taskDate->createDateLine() << " at " << time << ":";
+        if (description != EMPTY_DESCRIPTION) cout << " \""<< description << "\"" << endl;
+    else cout << endl;
+}
+
+void sortTasks(vector<shared_ptr<Task>>& tasks){
+    sort(tasks.begin(), tasks.end(), [](const shared_ptr<Task> a, const shared_ptr<Task> b) {
+        if (a->getTaskDate()->getYear() != b->getTaskDate()->getYear()) {
+            return a->getTaskDate()->getYear() < b->getTaskDate()->getYear();
+        }
+        if (a->getTaskDate()->getMonth() != b->getTaskDate()->getMonth()) {
+            return a->getTaskDate()->getMonth() < b->getTaskDate()->getMonth();
+        }
+        if (a->getTaskDate()->getDay() != b->getTaskDate()->getDay()) {
+            return a->getTaskDate()->getDay() < b->getTaskDate()->getDay();
+        }
+        return a->getTaskID() < b->getTaskID();
+    });
+}
