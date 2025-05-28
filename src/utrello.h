@@ -11,6 +11,8 @@ public:
     void addNewUser(const string& username, const string& password);
     void logToUser(const string& username, const string& password);
     void logoutFromUser();
+    shared_ptr<User> ifSomeOneLoggedIn();
+    void checkConflictsWithOthers(shared_ptr<Date> eventDate, shared_ptr<User> theUser, int start_time, int duration);
     void addNewEvent(string dateLine, int start_time, int duration, string title, const string& description);
     void addNewPeriodicEvent(string startDateLine, string endDateLine, int start_time, int duration, string type, 
                                 string title, const string& description, bool& holidayFoundFlag, int day=0, vector<string> week_days={});
