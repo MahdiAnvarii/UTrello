@@ -1,4 +1,5 @@
 # UTrello - Task & Event Scheduler  
+![UTrelloPic](https://drive.google.com/uc?export=view&id=10GTguiuto93vsm8TyHQNkB093Uyds2dG)
 
 ## 📝 Repository Description
 UTrello is a C++ command-line application that helps users organize tasks, events, and recurring schedules with:
