@@ -21,6 +21,9 @@ public:
     void addNewTask(shared_ptr<Date> taskDate, int time, string title, const string& description);
     void deleteTask(int taskID);
     void editTask(int taskID, string dateLine, int time, string title, const string& description);
+    void reportTasksHelper(shared_ptr<Date>& fromDate, shared_ptr<Date>& toDate, bool& isReportEmpty);
+    void reportEventsHelper(shared_ptr<Date>& fromDate, shared_ptr<Date>& toDate, bool& isReportEmpty);
+    void reportPeriodicEventsHelper(shared_ptr<Date>& fromDate, shared_ptr<Date>& toDate, bool& isReportEmpty);
     void reportJobs(shared_ptr<Date> fromDate, shared_ptr<Date> toDate, string type);
 private:
     string username;
