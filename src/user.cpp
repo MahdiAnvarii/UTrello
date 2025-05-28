@@ -48,6 +48,35 @@ void User::editTask(int taskID, string dateLine, int time, string title, const s
     else (*editedIt)->editTask(dateLine, time, title, description);
 }
 
+void User::reportTasksHelper(shared_ptr<Date>& fromDate, shared_ptr<Date>& toDate, bool& isReportEmpty){
+    for (auto task : tasks){
+        if (fromDate->isOnAnotherDate(*(task->getTaskDate()))) {
+            task->reportTask();
+            isReportEmpty = false;
+        }
+    }
+}
+
+void User::reportEventsHelper(shared_ptr<Date>& fromDate, shared_ptr<Date>& toDate, bool& isReportEmpty){
+    for (auto event : events){
+        if (fromDate->isOnAnotherDate(*(event->getEventDate()))) {
+            event->reportEvent();
+            isReportEmpty = false;
+        }
+    }
+}
+
+void User::reportPeriodicEventsHelper(shared_ptr<Date>& fromDate, shared_ptr<Date>& toDate, bool& isReportEmpty){
+    for (auto periodicEvent : periodicEvents){
+        for (auto periodicEventDate : periodicEvent->getPeriodicEventDates()){
+            if (fromDate->isOnAnotherDate(*periodicEventDate)) {
+                periodicEvent->reportPeriodicEvent(periodicEventDate);
+                isReportEmpty = false;
+            }
+        }
+    }
+}
+
 void User::reportJobs(shared_ptr<Date> fromDate, shared_ptr<Date> toDate, string type){
     bool isReportEmpty = true;
     sortEvents(events);
@@ -56,61 +85,27 @@ void User::reportJobs(shared_ptr<Date> fromDate, shared_ptr<Date> toDate, string
 
     if (type == EMPTY_TITLE){
         while (true){
-            for (auto periodicEvent : periodicEvents){
-                for (auto periodicEventDate : periodicEvent->getPeriodicEventDates()){
-                    if (fromDate->isOnAnotherDate(*periodicEventDate)) {
-                        periodicEvent->reportPeriodicEvent(periodicEventDate);
-                        isReportEmpty = false;
-                    }
-                }
-            }
-            for (auto event : events){
-                if (fromDate->isOnAnotherDate(*(event->getEventDate()))) {
-                    event->reportEvent();
-                    isReportEmpty = false;
-                }
-            }
-            for (auto task : tasks){
-                if (fromDate->isOnAnotherDate(*(task->getTaskDate()))) {
-                    task->reportTask();
-                    isReportEmpty = false;
-                }
-            }
+            reportPeriodicEventsHelper(fromDate, toDate, isReportEmpty);
+            reportEventsHelper(fromDate, toDate, isReportEmpty);
+            reportTasksHelper(fromDate, toDate, isReportEmpty);
             if (fromDate->isOnAnotherDate(*toDate)) break;
             fromDate = fromDate->createTommorow();
         }
     } else if (type == EVENT){
         while (true){
-            for (auto event : events){
-                if (fromDate->isOnAnotherDate(*(event->getEventDate()))) {
-                    event->reportEvent();
-                    isReportEmpty = false;
-                }
-            }
+            reportEventsHelper(fromDate, toDate, isReportEmpty);
             if (fromDate->isOnAnotherDate(*toDate)) break;
             fromDate = fromDate->createTommorow();
         }
     } else if (type == PERIODIC_EVENT){
         while (true){
-            for (auto periodicEvent : periodicEvents){
-                for (auto periodicEventDate : periodicEvent->getPeriodicEventDates()){
-                    if (fromDate->isOnAnotherDate(*periodicEventDate)) {
-                        periodicEvent->reportPeriodicEvent(periodicEventDate);
-                        isReportEmpty = false;
-                    }
-                }
-            }
+            reportPeriodicEventsHelper(fromDate, toDate, isReportEmpty);
             if (fromDate->isOnAnotherDate(*toDate)) break;
             fromDate = fromDate->createTommorow();
         }
     } else if (type == TASK){
         while (true){
-            for (auto task : tasks){
-                if (fromDate->isOnAnotherDate(*(task->getTaskDate()))) {
-                    task->reportTask();
-                    isReportEmpty = false;
-                }
-            }
+            reportTasksHelper(fromDate, toDate, isReportEmpty);
             if (fromDate->isOnAnotherDate(*toDate)) break;
             fromDate = fromDate->createTommorow();
         }
@@ -118,7 +113,6 @@ void User::reportJobs(shared_ptr<Date> fromDate, shared_ptr<Date> toDate, string
 
     if (isReportEmpty) throw Empty();
 }
-
 
 string User::getUsername() const { return username; }
 string User::getPassword() const { return password; }
