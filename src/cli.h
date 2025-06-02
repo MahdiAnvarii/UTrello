@@ -18,6 +18,10 @@ private:
     void deleteTask(vector<string> orderToVector);
     void editTask(vector<string> orderToVector);
     void reportJobs(vector<string> orderToVector);
+    void createJoinEvent(vector<string> orderToVector);
+    void checkInvitationList(vector<string> orderToVector);
+    void confirmJoinEvent(vector<string> orderToVector);
+    void rejectJoinEvent(vector<string> orderToVector);
     shared_ptr<UTrello>& app;
 };
 
