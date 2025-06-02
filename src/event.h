@@ -4,6 +4,8 @@
 #include "utils.h"
 #include "date.h"
 
+class User; 
+
 class Event{
 public:
     Event(shared_ptr<Date> eventDate_, int eventCounter_, int start_time_, int duration_, string title_, string description_);
@@ -55,8 +57,34 @@ private:
     string description;
 };
 
+class JoinEvent{
+public:
+    JoinEvent(shared_ptr<Date> JoinEventDate_, int JoinEventCounter_, int start_time_, int duration_, string title_, 
+                string description_, string hostUserName_, shared_ptr<User> host_);
+    shared_ptr<Date> getJoinEventDate() const;
+    weak_ptr<User> getHostWeakPointer() const;
+    int getJoinEventStartTime() const;
+    int getJoinEventDuration() const;
+    int getJoinEventID() const;
+    void printInvitation();
+    void reportJoinEvent();
+    int getAcceptedGuests() const;
+    void increaseAcceptedGuests();
+private:
+    weak_ptr<User> host;
+    shared_ptr<Date> joinEventDate;
+    int joinEventID;
+    int start_time; 
+    int duration;
+    string title;
+    string description;
+    string hostUserName;
+    int acceptedGuests = 0;
+};
+
 void sortEvents(vector<shared_ptr<Event>>& events);
 void sortPeriodicEvents(vector<shared_ptr<PeriodicEvent>>& periodicEvents);
 void sortTasks(vector<shared_ptr<Task>>& tasks);
+void sortJoinEvents(vector<shared_ptr<JoinEvent>>& joinEvents);
 
 #endif //EVENT_H
