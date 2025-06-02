@@ -20,6 +20,9 @@ void CliHandler::start(){
                 else if (orderToVector[1] == EVENT) createEvent(orderToVector); 
                 else if (orderToVector[1] == PERIODIC_EVENT) createPeriodicEvent(orderToVector); 
                 else if (orderToVector[1] == TASK) createTask(orderToVector); 
+                else if (orderToVector[1] == JOIN_EVENT) createJoinEvent(orderToVector);
+                else if (orderToVector[1] == CONFIRM_JOIN_EVENT) confirmJoinEvent(orderToVector);
+                else if (orderToVector[1] == REJECT_JOIN_EVENT) rejectJoinEvent(orderToVector);
             }
             else if (orderToVector[0] == DELETE){
                 if (find(DELETE_ORDERS.begin(), DELETE_ORDERS.end(), orderToVector[1]) == DELETE_ORDERS.end()) throw NotFound();
@@ -31,7 +34,8 @@ void CliHandler::start(){
             }
             else if (orderToVector[0] == GET){
                 if (find(GET_ORDERS.begin(), GET_ORDERS.end(), orderToVector[1]) == GET_ORDERS.end()) throw NotFound();
-                else if (orderToVector[1] == REPORT) reportJobs(orderToVector);  
+                else if (orderToVector[1] == REPORT) reportJobs(orderToVector);
+                else if (orderToVector[1] == JOIN_EVENT) checkInvitationList(orderToVector); 
             }
             
         } catch (const logic_error& e) {
@@ -171,7 +175,7 @@ void CliHandler::createPeriodicEvent(vector<string> orderToVector){
                 abs(titleIndex-weekDaysIndex) == 1 || weekDaysIndex+1 >= orderToVector.size()) throw BadRequest();
 
             if (orderToVector[weekDaysIndex+1] == "") throw BadRequest();
-            vector<string> daysOfWeekForEvent = splitDaysOFWeek(orderToVector[weekDaysIndex+1]);
+            vector<string> daysOfWeekForEvent = splitByCommas(orderToVector[weekDaysIndex+1]);
             for (auto dayOfWeekForEvent : daysOfWeekForEvent){
                 if (find(DAYS_OF_WEEK.begin(), DAYS_OF_WEEK.end(), dayOfWeekForEvent) == DAYS_OF_WEEK.end()) throw BadRequest();
             }
@@ -288,6 +292,77 @@ void CliHandler::reportJobs(vector<string> orderToVector){
         if (typeIt != orderToVector.end()) type = orderToVector[typeIndex+1];
 
         app->reportJobs(fromDateLine, toDateLine, type);
+
+    } catch (const logic_error& e) {
+        cout << e.what() << "\n";
+    }
+}
+
+void CliHandler::createJoinEvent(vector<string> orderToVector){
+    try {
+        auto guestsIt = find(orderToVector.begin(), orderToVector.end(), GUESTS);
+        int guestsIndex = distance(orderToVector.begin(), guestsIt);
+        auto dateIt = find(orderToVector.begin(), orderToVector.end(), DATE);
+        int dateIndex = distance(orderToVector.begin(), dateIt);
+        auto startTimeIt = find(orderToVector.begin(), orderToVector.end(), START_TIME);
+        int startTimeIndex = distance(orderToVector.begin(), startTimeIt);
+        auto endTimeIt = find(orderToVector.begin(), orderToVector.end(), END_TIME);
+        int endTimeIndex = distance(orderToVector.begin(), endTimeIt);
+        auto titleIt = find(orderToVector.begin(), orderToVector.end(), TITLE);
+        int titleIndex = distance(orderToVector.begin(), titleIt);
+        auto descriptionIt = find(orderToVector.begin(), orderToVector.end(), DESCRIPTION);
+        int descriptionIndex = distance(orderToVector.begin(), descriptionIt);
+        if (guestsIt == orderToVector.end() || dateIt == orderToVector.end() || startTimeIt == orderToVector.end() || 
+            endTimeIt == orderToVector.end() || titleIt == orderToVector.end() || abs(guestsIndex-dateIndex) == 1 ||
+            abs(guestsIndex-startTimeIndex) == 1 || abs(guestsIndex-endTimeIndex) == 1 || abs(guestsIndex-titleIndex) == 1 ||
+            abs(dateIndex-startTimeIndex) == 1 || abs(dateIndex-endTimeIndex) == 1 || abs(dateIndex-titleIndex) == 1 ||
+            abs(startTimeIndex-endTimeIndex) == 1 || abs(startTimeIndex-titleIndex) == 1 || abs(endTimeIndex-titleIndex) == 1 ||
+            guestsIndex+1 >= orderToVector.size() || dateIndex+1 >= orderToVector.size() || startTimeIndex+1 >= orderToVector.size() ||
+            endTimeIndex+1 >= orderToVector.size() || titleIndex+1 >= orderToVector.size()) throw BadRequest();
+
+        if (orderToVector[guestsIndex+1] == "") throw BadRequest();
+        string description = EMPTY_DESCRIPTION;
+        if (descriptionIt != orderToVector.end() && descriptionIndex+1 < orderToVector.size()) description = orderToVector[descriptionIndex+1];
+        app->addNewJoinEvent(orderToVector[guestsIndex+1], orderToVector[dateIndex+1], stoi(orderToVector[startTimeIndex+1]), 
+                            stoi(orderToVector[endTimeIndex+1]), orderToVector[titleIndex+1], description);
+        cout << "OK" << "\n";
+            
+    } catch (const logic_error& e) {
+        cout << e.what() << "\n";
+    }
+}
+
+void CliHandler::checkInvitationList(vector<string> orderToVector){
+    try {
+        app->checkInvitationList();
+            
+    } catch (const logic_error& e) {
+        cout << e.what() << "\n";
+    }
+}
+
+void CliHandler::confirmJoinEvent(vector<string> orderToVector){
+    try {
+        auto invitationIdIt = find(orderToVector.begin(), orderToVector.end(), INVITATION_ID);
+        int invitationIdIndex = distance(orderToVector.begin(), invitationIdIt);
+        if (invitationIdIt == orderToVector.end() || invitationIdIndex+1 == orderToVector.size()) throw BadRequest();
+
+        app->confirmJoinEvent(stoi(orderToVector[invitationIdIndex+1]));
+        cout << "OK" << "\n";
+
+    } catch (const logic_error& e) {
+        cout << e.what() << "\n";
+    }
+}
+
+void CliHandler::rejectJoinEvent(vector<string> orderToVector){
+    try {
+        auto invitationIdIt = find(orderToVector.begin(), orderToVector.end(), INVITATION_ID);
+        int invitationIdIndex = distance(orderToVector.begin(), invitationIdIt);
+        if (invitationIdIt == orderToVector.end() || invitationIdIndex+1 == orderToVector.size()) throw BadRequest();
+
+        app->rejectJoinEvent(stoi(orderToVector[invitationIdIndex+1]));
+        cout << "OK" << "\n";
 
     } catch (const logic_error& e) {
         cout << e.what() << "\n";
