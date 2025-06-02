@@ -30,11 +30,11 @@ void UTrello::addNewUser(const string& username, const string& password){
     }
     shared_ptr<User> newUser = make_shared<User>(username, password);
     users.push_back(newUser);
-    userUsernames.push_back(username);
+    usersUsernames.push_back(username);
 }
 
 void UTrello::logToUser(const string& username, const string& password){
-    if (find(userUsernames.begin(), userUsernames.end(), username) == userUsernames.end()) throw NotFound();
+    if (find(usersUsernames.begin(), usersUsernames.end(), username) == usersUsernames.end()) throw NotFound();
     for (auto user: users){
         if (user->getUsername() == username && user->getPassword() != password) throw PermissionDenied();
     }
@@ -66,26 +66,11 @@ shared_ptr<User> UTrello::ifSomeOneLoggedIn(){
     return theUser;
 }
 
-void UTrello::checkConflictsWithOthers(shared_ptr<Date> eventDate, shared_ptr<User> theUser, int start_time, int duration){
-    for (auto userEvent : theUser->getEvents()){
-        if (eventDate->isOnAnotherDate(*(userEvent->getEventDate())) && 
-            start_time+duration > userEvent->getEventStartTime() && 
-            start_time < userEvent->getEventStartTime()+userEvent->getEventDuration()) throw Overlap();
-    }
-    for (auto userPeriodicEvent : theUser->getPeriodicEvents()){
-        for (auto periodicEventDate : userPeriodicEvent->getPeriodicEventDates()){
-            if (eventDate->isOnAnotherDate(*(periodicEventDate)) && 
-                start_time+duration > userPeriodicEvent->getPeriodicEventStartTime() && 
-                start_time < userPeriodicEvent->getPeriodicEventStartTime()+userPeriodicEvent->getPeriodicEventDuration()) throw Overlap();
-        }
-    }
-}
-
 void UTrello::addNewEvent(string dateLine, int start_time, int duration, string title, const string& description){
     shared_ptr<User> theUser = ifSomeOneLoggedIn();
     if (start_time > CLOCK_END || start_time < CLOCK_START || duration <= CLOCK_START) throw BadRequest();
     shared_ptr<Date> eventDate = make_shared<Date>(dateLine);
-    checkConflictsWithOthers(eventDate, theUser, start_time, duration);
+    theUser->checkConflictsWithOthers(eventDate, start_time, duration);
 
     for (auto holiday : holidays){
         if (eventDate->isOnAnotherDate(*holiday)) throw HolidayFound();
@@ -111,7 +96,7 @@ void UTrello::addNewPeriodicEvent(string startDateLine, string endDateLine, int 
     if (periodicType == PeriodicType::Daily){
         shared_ptr<Date> potentialDate = eventStartDate;
         while (true) {
-            checkConflictsWithOthers(potentialDate, theUser, start_time, duration);
+            theUser->checkConflictsWithOthers(potentialDate, start_time, duration);
             potentialPeriodicEventDates.push_back(potentialDate);
             if (potentialDate->isOnAnotherDate(*eventEndDate)) break;
             potentialDate = potentialDate->createTommorow();
@@ -120,7 +105,7 @@ void UTrello::addNewPeriodicEvent(string startDateLine, string endDateLine, int 
     else if (periodicType == PeriodicType::Monthly){
         shared_ptr<Date> potentialDate = eventStartDate->createPeriodDay(day);
         while (true) {
-            checkConflictsWithOthers(potentialDate, theUser, start_time, duration);
+            theUser->checkConflictsWithOthers(potentialDate, start_time, duration);
             potentialPeriodicEventDates.push_back(potentialDate);
             potentialDate = potentialDate->createTheNextMonth();
             if (potentialDate->isAfterDate(*eventEndDate)) break;
@@ -129,7 +114,7 @@ void UTrello::addNewPeriodicEvent(string startDateLine, string endDateLine, int 
     else if (periodicType == PeriodicType::Weekly){
         shared_ptr<Date> potentialDate = eventStartDate;
         while (true) {
-            checkConflictsWithOthers(potentialDate, theUser, start_time, duration);
+            theUser->checkConflictsWithOthers(potentialDate, start_time, duration);
             potentialPeriodicEventDates.push_back(potentialDate);
             if (potentialDate->isOnAnotherDate(*eventEndDate)) break;
             potentialDate = potentialDate->createTheNextDayOfWeek(daysOfWeek);
@@ -178,4 +163,42 @@ void UTrello::reportJobs(string fromDateLine, string toDateLine, string type){
     if (fromDateLine != EMPTY_DATELINE) fromDate = make_shared<Date>(fromDateLine);
     else fromDate = make_shared<Date>(1, 1, 1404, true);
     theUser->reportJobs(fromDate, toDate, type);
+}
+
+void UTrello::addNewJoinEvent(string guestsLine, string dateLine, int start_time, int end_time, string title, const string& description){
+    shared_ptr<User> theUser = ifSomeOneLoggedIn();
+    if (start_time > CLOCK_END || start_time < CLOCK_START || end_time > CLOCK_END || end_time < CLOCK_START) throw BadRequest();
+    vector<string> guestsNames = splitByCommas(guestsLine);
+    for (auto guestsName : guestsNames){
+        if (find(usersUsernames.begin(), usersUsernames.end(), guestsName) == usersUsernames.end()) throw NotFound();
+    }
+
+    shared_ptr<Date> joinEventDate = make_shared<Date>(dateLine);
+    theUser->checkConflictsWithOthers(joinEventDate, start_time, end_time-start_time);
+    for (auto holiday : holidays){
+        if (joinEventDate->isOnAnotherDate(*holiday)) throw HolidayFound();
+    }
+
+    vector<shared_ptr<User>> guestUsers;
+    for (auto user: users){
+        if (find(guestsNames.begin(), guestsNames.end(), user->getUsername()) != guestsNames.end())
+        guestUsers.push_back(user);
+    }
+    theUser->createNewJoinEvent(guestUsers, joinEventDate, joinEventCounter, start_time, end_time-start_time, title, description);
+    joinEventCounter+=1;
+}
+
+void UTrello::checkInvitationList(){
+    shared_ptr<User> theUser = ifSomeOneLoggedIn();
+    theUser->checkInvitationList();
+}
+
+void UTrello::confirmJoinEvent(int invitationID){
+    shared_ptr<User> theUser = ifSomeOneLoggedIn();
+    theUser->confirmJoinEvent(invitationID);
+}
+
+void UTrello::rejectJoinEvent(int invitationID){
+    shared_ptr<User> theUser = ifSomeOneLoggedIn();
+    theUser->rejectJoinEvent(invitationID);
 }
