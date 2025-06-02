@@ -51,13 +51,14 @@ vector<string> splitTheOrder(string order){
     return orderToVector;
 }
 
-vector<string> splitDaysOFWeek(string daysContainer){
-    istringstream iss(daysContainer);
-    vector<string> daysOfWeek;
-    string dayOfWeek;
+vector<string> splitByCommas(string theContainer){
+    theContainer.erase(remove(theContainer.begin(), theContainer.end(), '\"'), theContainer.end());
+    istringstream iss(theContainer);
+    vector<string> theVector;
+    string theElement;
 
-    while (getline(iss, dayOfWeek, ',')) {
-        daysOfWeek.push_back(dayOfWeek);
+    while (getline(iss, theElement, ',')) {
+        theVector.push_back(theElement);
     }
-    return daysOfWeek;
+    return theVector;
 }
