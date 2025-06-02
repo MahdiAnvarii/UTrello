@@ -12,19 +12,23 @@ public:
     void logToUser(const string& username, const string& password);
     void logoutFromUser();
     shared_ptr<User> ifSomeOneLoggedIn();
-    void checkConflictsWithOthers(shared_ptr<Date> eventDate, shared_ptr<User> theUser, int start_time, int duration);
     void addNewEvent(string dateLine, int start_time, int duration, string title, const string& description);
     void addNewPeriodicEvent(string startDateLine, string endDateLine, int start_time, int duration, string type, 
                                 string title, const string& description, bool& holidayFoundFlag, int day=0, vector<string> week_days={});
     void addNewTask(string dateLine, int time, string title, const string& description);
     void deleteTask(int taskID);
     void editTask(int taskID, string dateLine, int time, string title, const string& description);
-    void reportJobs(string fromDateLine, string toDateLine, string type);             
+    void reportJobs(string fromDateLine, string toDateLine, string type);
+    void addNewJoinEvent(string guestsLine, string dateLine, int start_time, int end_time, string title, const string& description);
+    void checkInvitationList();
+    void confirmJoinEvent(int invitationID);
+    void rejectJoinEvent(int invitationID);    
 private:
     void processHolidayFile(const string& holidayFileAddress_);
     vector<shared_ptr<Date>> holidays;
     vector<shared_ptr<User>> users;
-    vector<string> userUsernames;
+    vector<string> usersUsernames;
+    int joinEventCounter = 1;
 };
 
 #endif //UTRELLO_H
