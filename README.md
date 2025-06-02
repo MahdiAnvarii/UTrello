@@ -6,17 +6,19 @@ UTrello is a C++ command-line application that helps users organize tasks, event
 - ✅ User authentication
 - 📅 Date/time management
 - 🔄 Support for periodic events (daily/weekly/monthly)
+- 🤝 Join events with guest invitations and responses
 - 📊 Reporting system
 - 🚫 Conflict detection (overlaps/holidays)
 
 ## 🚀 Features
 - User System: Signup/login/logout with credential validation
 
-- 3 Job Types:
+- 4 Job Types:
 
   - One-time Events (with duration)
   - Periodic Events (daily/weekly/monthly recurrence)
   - Simple Tasks (single timepoint)
+  - Join Events (collaborative scheduling with guest invites)
 
 - Smart Scheduling:
   
@@ -37,7 +39,7 @@ UTrello is a C++ command-line application that helps users organize tasks, event
 git clone https://github.com/MahdiAnvarii/UTrello.git
 cd UTrello
 make
-./UTrello holidays.csv  # Sample holiday file
+make run
 ```
 
 ## 💻 Usage Examples
