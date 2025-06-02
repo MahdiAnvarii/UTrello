@@ -18,15 +18,15 @@ const int MONTHS_PER_YEAR = 12;
 const int DAYS_PER_MONTH = 30;
 const int DAYS_PER_WEEK = 7;
 const vector<string> ORDERS = {"POST", "DELETE", "PUT", "GET"};
-const vector<string> SUBORDERS = {"signup", "login", "logout", "event", "periodic_event", "task", "report"};
+const vector<string> SUBORDERS = {"signup", "login", "logout", "event", "periodic_event", "task", "report", "join_event", "confirm_join_event", "reject_join_event"};
 const string POST = ORDERS[0];
 const string DELETE = ORDERS[1];
 const string PUT = ORDERS[2];
 const string GET = ORDERS[3];
-const vector<string> POST_ORDERS = {"signup", "login", "logout", "event", "periodic_event", "task"};
+const vector<string> POST_ORDERS = {"signup", "login", "logout", "event", "periodic_event", "task", "join_event", "confirm_join_event", "reject_join_event"};
 const vector<string> DELETE_ORDERS = {"task"};
 const vector<string> PUT_ORDERS = {"task"};
-const vector<string> GET_ORDERS = {"report"};
+const vector<string> GET_ORDERS = {"report", "join_event"};
 const string SIGNUP = SUBORDERS[0];
 const string LOGIN = SUBORDERS[1];
 const string LOGOUT = SUBORDERS[2];
@@ -34,6 +34,9 @@ const string EVENT = SUBORDERS[3];
 const string PERIODIC_EVENT = SUBORDERS[4];
 const string TASK = SUBORDERS[5];
 const string REPORT = SUBORDERS[6];
+const string JOIN_EVENT = SUBORDERS[7];
+const string CONFIRM_JOIN_EVENT = SUBORDERS[8];
+const string REJECT_JOIN_EVENT = SUBORDERS[9];
 const string USERNAME = "username";
 const string PASSWORD = "password";
 const string DATE = "date";
@@ -62,7 +65,10 @@ const string MONTHLY = PERIODIC_TYPE[2];
 const string DAY = "day";
 const string WEEK_DAYS = "week_days";
 const vector<string> DAYS_OF_WEEK = {"Friday", "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"};
-const vector<string> JOB_TYPES = {"event", "periodic_event", "task"};
+const vector<string> JOB_TYPES = {"event", "periodic_event", "task", "join_event"};
+const string GUESTS = "guests";
+const string END_TIME = "end_time";
+const string INVITATION_ID = "invitation_id";
 
 enum class DayOfWeek {
     Friday,
@@ -84,6 +90,6 @@ PeriodicType stringToPeriodicType(const string& s);
 DayOfWeek stringToDayOfWeek(const string& s);
 string periodicTypeToString(PeriodicType type);
 vector<string> splitTheOrder(string order);
-vector<string> splitDaysOFWeek(string daysContainer);
+vector<string> splitByCommas(string theContainer);
 
 #endif //UTILS_H
