@@ -113,3 +113,52 @@ void sortTasks(vector<shared_ptr<Task>>& tasks){
         return a->getTaskID() < b->getTaskID();
     });
 }
+
+
+JoinEvent::JoinEvent(shared_ptr<Date> joinEventDate_, int joinEventCounter_, int start_time_, int duration_, string title_, 
+                    string description_, string hostUserName_, shared_ptr<User> host_): joinEventDate(joinEventDate_), host(host_){
+    joinEventID = joinEventCounter_;
+    start_time = start_time_;
+    duration = duration_; 
+    title = title_;
+    description = description_;
+    hostUserName = hostUserName_;
+}
+
+void JoinEvent::printInvitation(){
+    cout << joinEventID << ". \"" << title << "\" - " << joinEventDate->createDateLine() << " - " 
+    << start_time << " - " << start_time+duration << endl;
+}
+
+void JoinEvent::reportJoinEvent(){
+    cout << "join_event \"" << title << "\" on " << joinEventDate->createDateLine() << " from " << start_time 
+    << " to " << start_time+duration << " hosted by " << "\"" << hostUserName << "\" :";
+    if (description != EMPTY_DESCRIPTION) cout << " \""<< description << "\"" << endl;
+    else cout << endl;
+}
+
+void sortJoinEvents(vector<shared_ptr<JoinEvent>>& joinEvents){
+    sort(joinEvents.begin(), joinEvents.end(), [](const shared_ptr<JoinEvent> a, const shared_ptr<JoinEvent> b) {
+        if (a->getJoinEventDate()->getYear() != b->getJoinEventDate()->getYear()) {
+            return a->getJoinEventDate()->getYear() < b->getJoinEventDate()->getYear();
+        }
+        if (a->getJoinEventDate()->getMonth() != b->getJoinEventDate()->getMonth()) {
+            return a->getJoinEventDate()->getMonth() < b->getJoinEventDate()->getMonth();
+        }
+        if (a->getJoinEventDate()->getDay() != b->getJoinEventDate()->getDay()) {
+            return a->getJoinEventDate()->getDay() < b->getJoinEventDate()->getDay();
+        }
+        if (a->getJoinEventStartTime() != b->getJoinEventStartTime()) {
+            return a->getJoinEventStartTime() < b->getJoinEventStartTime();
+        }
+        return a->getJoinEventID() < b->getJoinEventID();
+    });
+}
+
+shared_ptr<Date> JoinEvent::getJoinEventDate() const { return joinEventDate; }
+weak_ptr<User> JoinEvent::getHostWeakPointer() const { return host; }
+int JoinEvent::getJoinEventStartTime() const { return start_time; }
+int JoinEvent::getJoinEventDuration() const { return duration; }
+int JoinEvent::getJoinEventID() const { return joinEventID; }
+int JoinEvent::getAcceptedGuests() const { return acceptedGuests; }
+void JoinEvent::increaseAcceptedGuests() { acceptedGuests+=1; }
