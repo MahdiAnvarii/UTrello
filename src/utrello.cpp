@@ -31,6 +31,7 @@ void UTrello::addNewUser(const string& username, const string& password){
     shared_ptr<User> newUser = make_shared<User>(username, password);
     users.push_back(newUser);
     usersUsernames.push_back(username);
+    newUser->login();
 }
 
 void UTrello::logToUser(const string& username, const string& password){
