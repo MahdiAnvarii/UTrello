@@ -178,16 +178,14 @@ void User::confirmJoinEvent(int invitationID){
         });
 
     if (invitedIt == invitedJoinEvents.end()) throw NotFound();
-    else {
-        invitedJoinEvents.erase(invitedIt);
-        checkConflictsWithOthers((*invitedIt)->getJoinEventDate(), (*invitedIt)->getJoinEventStartTime(), (*invitedIt)->getJoinEventDuration());
-        joinEvents.push_back(*invitedIt);
-        (*invitedIt)->increaseAcceptedGuests();
-        if ((*invitedIt)->getAcceptedGuests() == 1){
-            auto theHost = (*invitedIt)->getHostWeakPointer();
-            if (auto hostPtr = theHost.lock()) hostPtr->addHostToTheEvent((*invitedIt));
-        }
+    checkConflictsWithOthers((*invitedIt)->getJoinEventDate(), (*invitedIt)->getJoinEventStartTime(), (*invitedIt)->getJoinEventDuration());
+    joinEvents.push_back(*invitedIt);
+    (*invitedIt)->increaseAcceptedGuests();
+    if ((*invitedIt)->getAcceptedGuests() == 1){
+        auto theHost = (*invitedIt)->getHostWeakPointer();
+        if (auto hostPtr = theHost.lock()) hostPtr->addHostToTheEvent((*invitedIt));
     }
+    invitedJoinEvents.erase(invitedIt);
 }
 
 void User::rejectJoinEvent(int invitationID){
