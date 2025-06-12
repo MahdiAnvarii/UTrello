@@ -48,6 +48,7 @@ public:
     void editTask(string dateLine_, int time_, string title_, string description_);
     shared_ptr<Date> getTaskDate() const;
     int getTaskID() const;
+    int getTaskTime() const;
     void reportTask();
 private:
     shared_ptr<Date> taskDate;

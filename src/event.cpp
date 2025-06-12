@@ -110,6 +110,9 @@ void sortTasks(vector<shared_ptr<Task>>& tasks){
         if (a->getTaskDate()->getDay() != b->getTaskDate()->getDay()) {
             return a->getTaskDate()->getDay() < b->getTaskDate()->getDay();
         }
+         if (a->getTaskTime() != b->getTaskTime()) {
+            return a->getTaskTime() < b->getTaskTime();
+        }
         return a->getTaskID() < b->getTaskID();
     });
 }
