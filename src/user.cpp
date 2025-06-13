@@ -68,45 +68,46 @@ void User::editTask(int taskID, string dateLine, int time, string title, const s
     else (*editedIt)->editTask(dateLine, time, title, description);
 }
 
-void User::reportTasksHelper(shared_ptr<Date>& fromDate, shared_ptr<Date>& toDate, bool& isReportEmpty){
+void User::reportTasksHelper(shared_ptr<Date>& fromDate, vector<string>& reportResultsVector, bool& isReportEmpty){
     for (auto task : tasks){
         if (fromDate->isOnAnotherDate(*(task->getTaskDate()))) {
-            task->reportTask();
+            reportResultsVector.push_back(task->reportTask());
             isReportEmpty = false;
         }
     }
 }
 
-void User::reportEventsHelper(shared_ptr<Date>& fromDate, shared_ptr<Date>& toDate, bool& isReportEmpty){
+void User::reportEventsHelper(shared_ptr<Date>& fromDate, vector<string>& reportResultsVector, bool& isReportEmpty){
     for (auto event : events){
         if (fromDate->isOnAnotherDate(*(event->getEventDate()))) {
-            event->reportEvent();
+            reportResultsVector.push_back(event->reportEvent());
             isReportEmpty = false;
         }
     }
 }
 
-void User::reportPeriodicEventsHelper(shared_ptr<Date>& fromDate, shared_ptr<Date>& toDate, bool& isReportEmpty){
+void User::reportPeriodicEventsHelper(shared_ptr<Date>& fromDate, vector<string>& reportResultsVector, bool& isReportEmpty){
     for (auto periodicEvent : periodicEvents){
         for (auto periodicEventDate : periodicEvent->getPeriodicEventDates()){
             if (fromDate->isOnAnotherDate(*periodicEventDate)) {
-                periodicEvent->reportPeriodicEvent(periodicEventDate);
+                reportResultsVector.push_back(periodicEvent->reportPeriodicEvent(periodicEventDate));
                 isReportEmpty = false;
             }
         }
     }
 }
 
-void User::reportJoinEventsHelper(shared_ptr<Date>& fromDate, shared_ptr<Date>& toDate, bool& isReportEmpty){
+void User::reportJoinEventsHelper(shared_ptr<Date>& fromDate, vector<string>& reportResultsVector, bool& isReportEmpty){
     for (auto joinEvent : joinEvents){
         if (fromDate->isOnAnotherDate(*(joinEvent->getJoinEventDate()))) {
-            joinEvent->reportJoinEvent();
+            reportResultsVector.push_back(joinEvent->reportJoinEvent());
             isReportEmpty = false;
         }
     }
 }
 
-void User::reportJobs(shared_ptr<Date> fromDate, shared_ptr<Date> toDate, string type){
+vector<string> User::reportJobs(shared_ptr<Date> fromDate, shared_ptr<Date> toDate, string type){
+    vector<string> reportResultsVector;
     bool isReportEmpty = true;
     sortEvents(events);
     sortPeriodicEvents(periodicEvents);
@@ -115,40 +116,41 @@ void User::reportJobs(shared_ptr<Date> fromDate, shared_ptr<Date> toDate, string
 
     if (type == EMPTY_TITLE){
         while (true){
-            reportJoinEventsHelper(fromDate, toDate, isReportEmpty);
-            reportPeriodicEventsHelper(fromDate, toDate, isReportEmpty);
-            reportEventsHelper(fromDate, toDate, isReportEmpty);
-            reportTasksHelper(fromDate, toDate, isReportEmpty);
+            reportJoinEventsHelper(fromDate, reportResultsVector, isReportEmpty);
+            reportPeriodicEventsHelper(fromDate, reportResultsVector, isReportEmpty);
+            reportEventsHelper(fromDate, reportResultsVector, isReportEmpty);
+            reportTasksHelper(fromDate, reportResultsVector, isReportEmpty);
             if (fromDate->isOnAnotherDate(*toDate)) break;
             fromDate = fromDate->createTommorow();
         }
     } else if (type == EVENT){
         while (true){
-            reportEventsHelper(fromDate, toDate, isReportEmpty);
+            reportEventsHelper(fromDate, reportResultsVector, isReportEmpty);
             if (fromDate->isOnAnotherDate(*toDate)) break;
             fromDate = fromDate->createTommorow();
         }
     } else if (type == PERIODIC_EVENT){
         while (true){
-            reportPeriodicEventsHelper(fromDate, toDate, isReportEmpty);
+            reportPeriodicEventsHelper(fromDate, reportResultsVector, isReportEmpty);
             if (fromDate->isOnAnotherDate(*toDate)) break;
             fromDate = fromDate->createTommorow();
         }
     } else if (type == TASK){
         while (true){
-            reportTasksHelper(fromDate, toDate, isReportEmpty);
+            reportTasksHelper(fromDate, reportResultsVector, isReportEmpty);
             if (fromDate->isOnAnotherDate(*toDate)) break;
             fromDate = fromDate->createTommorow();
         }
     } else if (type == JOIN_EVENT){
         while (true){
-            reportJoinEventsHelper(fromDate, toDate, isReportEmpty);
+            reportJoinEventsHelper(fromDate, reportResultsVector, isReportEmpty);
             if (fromDate->isOnAnotherDate(*toDate)) break;
             fromDate = fromDate->createTommorow();
         }
     }
 
     if (isReportEmpty) throw Empty();
+    return reportResultsVector;
 }
 
 void User::createNewJoinEvent(vector<shared_ptr<User>> guestUsers, shared_ptr<Date> joinEventDate, int joinEventCounter, 
@@ -167,9 +169,11 @@ void User::sendJoinEventInvitation(shared_ptr<JoinEvent> newJoinEvent){
     invitedJoinEvents.push_back(newJoinEvent);
 }
 
-void User::checkInvitationList(){
+vector<string> User::checkInvitationList(){
+    vector<string> invitationList;
     if (invitedJoinEvents.empty()) throw Empty();
-    for (auto invitedJoinEvent : invitedJoinEvents) invitedJoinEvent->printInvitation();
+    for (auto invitedJoinEvent : invitedJoinEvents) invitationList.push_back(invitedJoinEvent->printInvitation());
+    return invitationList;
 }
 
 void User::confirmJoinEvent(int invitationID){
@@ -178,15 +182,18 @@ void User::confirmJoinEvent(int invitationID){
         });
 
     if (invitedIt == invitedJoinEvents.end()) throw NotFound();
-    checkConflictsWithOthers((*invitedIt)->getJoinEventDate(), (*invitedIt)->getJoinEventStartTime(), (*invitedIt)->getJoinEventDuration());
-    joinEvents.push_back(*invitedIt);
-    (*invitedIt)->increaseAcceptedGuests();
-    if ((*invitedIt)->getAcceptedGuests() == 1){
-        auto theHost = (*invitedIt)->getHostWeakPointer();
-        if (auto hostPtr = theHost.lock()) hostPtr->addHostToTheEvent((*invitedIt));
-    }
+    auto joinEventPtr = *invitedIt;
     invitedJoinEvents.erase(invitedIt);
+    checkConflictsWithOthers(joinEventPtr->getJoinEventDate(), joinEventPtr->getJoinEventStartTime(), joinEventPtr->getJoinEventDuration());
+    joinEvents.push_back(joinEventPtr);
+    joinEventPtr->increaseAcceptedGuests();
+    if (joinEventPtr->getAcceptedGuests() == 1) {
+        auto theHost = joinEventPtr->getHostWeakPointer();
+        if (auto hostPtr = theHost.lock())
+            hostPtr->addHostToTheEvent(joinEventPtr);
+    }
 }
+
 
 void User::rejectJoinEvent(int invitationID){
     auto invitedIt = find_if(invitedJoinEvents.begin(), invitedJoinEvents.end(), [invitationID](const shared_ptr<JoinEvent>& invitedJoinEvent){
