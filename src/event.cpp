@@ -14,11 +14,12 @@ int Event::getEventStartTime() const { return start_time; }
 int Event::getEventDuration() const { return duration; }
 int Event::getEventID() const { return eventID; }
 
-void Event::reportEvent(){
-    cout << "event \"" << title << "\" on " << eventDate->createDateLine() << " from " << start_time 
-    << " for " << duration << " hours:";
-    if (description != EMPTY_DESCRIPTION) cout << " \""<< description << "\"" << endl;
-    else cout << endl;
+string Event::reportEvent(){
+    string reportResult = "event \"" + title + "\" on " + eventDate->createDateLine() + " from " + to_string(start_time) + 
+                            " for " + to_string(duration) + " hours:";
+    if (description != EMPTY_DESCRIPTION) reportResult += " \""+ description + "\"" + "\n";
+    else reportResult += "\n";
+    return reportResult;
 }
 
 void sortEvents(vector<shared_ptr<Event>>& events){
@@ -55,11 +56,12 @@ int PeriodicEvent::getPeriodicEventStartTime() const { return start_time; }
 int PeriodicEvent::getPeriodicEventDuration() const { return duration; }
 int PeriodicEvent::getPeriodicEventID() const { return periodicEventID; }
 
-void PeriodicEvent::reportPeriodicEvent(shared_ptr<Date> periodicEventDate){
-    cout << "periodic_event \"" << title << "\" on " << periodicEventDate->createDateLine() << " from " << start_time 
-    << " for " << duration << " hours " << periodicTypeToString(periodicType) << ":";
-    if (description != EMPTY_DESCRIPTION) cout << " \""<< description << "\"" << endl;
-    else cout << endl;
+string PeriodicEvent::reportPeriodicEvent(shared_ptr<Date> periodicEventDate){
+    string reportResult = "periodic_event \"" + title + "\" on " + periodicEventDate->createDateLine() + " from " + to_string(start_time) + 
+                            " for " + to_string(duration) + " hours " + periodicTypeToString(periodicType) + ":";
+    if (description != EMPTY_DESCRIPTION) reportResult += " \""+ description + "\"" + "\n";
+    else reportResult += "\n";
+    return reportResult;
 }
 
 void sortPeriodicEvents(vector<shared_ptr<PeriodicEvent>>& periodicEvents){
@@ -91,12 +93,14 @@ void Task::editTask(string dateLine_, int time_, string title_, string descripti
 }
 
 shared_ptr<Date> Task::getTaskDate() const { return taskDate; }
+int Task::getTaskTime() const { return time; }
 int Task::getTaskID() const { return taskID; }
 
-void Task::reportTask(){
-    cout << "task \"" << title << "\" on " << taskDate->createDateLine() << " at " << time << ":";
-        if (description != EMPTY_DESCRIPTION) cout << " \""<< description << "\"" << endl;
-    else cout << endl;
+string Task::reportTask(){
+    string reportResult = "task \"" + title + "\" on " + taskDate->createDateLine() + " at " + to_string(time) + ":";
+    if (description != EMPTY_DESCRIPTION) reportResult += " \""+ description + "\"" + "\n";
+    else reportResult += "\n";
+    return reportResult;
 }
 
 void sortTasks(vector<shared_ptr<Task>>& tasks){
@@ -110,7 +114,7 @@ void sortTasks(vector<shared_ptr<Task>>& tasks){
         if (a->getTaskDate()->getDay() != b->getTaskDate()->getDay()) {
             return a->getTaskDate()->getDay() < b->getTaskDate()->getDay();
         }
-         if (a->getTaskTime() != b->getTaskTime()) {
+        if (a->getTaskTime() != b->getTaskTime()) {
             return a->getTaskTime() < b->getTaskTime();
         }
         return a->getTaskID() < b->getTaskID();
@@ -128,16 +132,18 @@ JoinEvent::JoinEvent(shared_ptr<Date> joinEventDate_, int joinEventCounter_, int
     hostUserName = hostUserName_;
 }
 
-void JoinEvent::printInvitation(){
-    cout << joinEventID << ". \"" << title << "\" - " << joinEventDate->createDateLine() << " - " 
-    << start_time << " - " << start_time+duration << endl;
+string JoinEvent::printInvitation(){
+    string invitationText = to_string(joinEventID) + ": \"" + title + "\" - " + joinEventDate->createDateLine() + " - " +
+                            to_string(start_time) + " - " + to_string(start_time+duration) + "\n";
+    return invitationText;
 }
 
-void JoinEvent::reportJoinEvent(){
-    cout << "join_event \"" << title << "\" on " << joinEventDate->createDateLine() << " from " << start_time 
-    << " to " << start_time+duration << " hosted by " << "\"" << hostUserName << "\" :";
-    if (description != EMPTY_DESCRIPTION) cout << " \""<< description << "\"" << endl;
-    else cout << endl;
+string JoinEvent::reportJoinEvent(){
+    string reportResult = "join_event \"" + title + "\" on " + joinEventDate->createDateLine() + " from " + to_string(start_time) +
+                            " to " + to_string(start_time+duration) + " hosted by " + "\"" + hostUserName + "\" :";
+    if (description != EMPTY_DESCRIPTION) reportResult += " \""+ description + "\"" + "\n";
+    else reportResult += "\n";
+    return reportResult;
 }
 
 void sortJoinEvents(vector<shared_ptr<JoinEvent>>& joinEvents){

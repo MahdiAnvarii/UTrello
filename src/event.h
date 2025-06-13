@@ -13,7 +13,7 @@ public:
     int getEventStartTime() const;
     int getEventDuration() const;
     int getEventID() const;
-    void reportEvent();
+    string reportEvent();
 private:
     shared_ptr<Date> eventDate;
     int eventID;
@@ -31,7 +31,7 @@ public:
     int getPeriodicEventStartTime() const;
     int getPeriodicEventDuration() const;
     int getPeriodicEventID() const;
-    void reportPeriodicEvent(shared_ptr<Date> periodicEventDate);
+    string reportPeriodicEvent(shared_ptr<Date> periodicEventDate);
 private:
     vector<shared_ptr<Date>> periodicEventDates;
     int periodicEventID;
@@ -49,7 +49,7 @@ public:
     shared_ptr<Date> getTaskDate() const;
     int getTaskID() const;
     int getTaskTime() const;
-    void reportTask();
+    string reportTask();
 private:
     shared_ptr<Date> taskDate;
     int taskID;
@@ -67,8 +67,8 @@ public:
     int getJoinEventStartTime() const;
     int getJoinEventDuration() const;
     int getJoinEventID() const;
-    void printInvitation();
-    void reportJoinEvent();
+    string printInvitation();
+    string reportJoinEvent();
     int getAcceptedGuests() const;
     void increaseAcceptedGuests();
 private:
