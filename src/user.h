@@ -22,15 +22,15 @@ public:
     void addNewTask(shared_ptr<Date> taskDate, int time, string title, const string& description);
     void deleteTask(int taskID);
     void editTask(int taskID, string dateLine, int time, string title, const string& description);
-    void reportTasksHelper(shared_ptr<Date>& fromDate, shared_ptr<Date>& toDate, bool& isReportEmpty);
-    void reportEventsHelper(shared_ptr<Date>& fromDate, shared_ptr<Date>& toDate, bool& isReportEmpty);
-    void reportPeriodicEventsHelper(shared_ptr<Date>& fromDate, shared_ptr<Date>& toDate, bool& isReportEmpty);
-    void reportJoinEventsHelper(shared_ptr<Date>& fromDate, shared_ptr<Date>& toDate, bool& isReportEmpty);
-    void reportJobs(shared_ptr<Date> fromDate, shared_ptr<Date> toDate, string type);
+    void reportTasksHelper(shared_ptr<Date>& fromDate, vector<string>& reportResultsVector, bool& isReportEmpty);
+    void reportEventsHelper(shared_ptr<Date>& fromDate, vector<string>& reportResultsVector, bool& isReportEmpty);
+    void reportPeriodicEventsHelper(shared_ptr<Date>& fromDate, vector<string>& reportResultsVector, bool& isReportEmpty);
+    void reportJoinEventsHelper(shared_ptr<Date>& fromDate, vector<string>& reportResultsVector, bool& isReportEmpty);
+    vector<string> reportJobs(shared_ptr<Date> fromDate, shared_ptr<Date> toDate, string type);
     void createNewJoinEvent(vector<shared_ptr<User>> guestUsers, shared_ptr<Date> joinEventDate, int joinEventCounter, 
                                 int start_time, int duration, string title, const string& description);
     void sendJoinEventInvitation(shared_ptr<JoinEvent> newJoinEvent);
-    void checkInvitationList();
+    vector<string> checkInvitationList();
     void confirmJoinEvent(int invitationID);
     void rejectJoinEvent(int invitationID);
     void addHostToTheEvent(shared_ptr<JoinEvent> newJoinEvent);
