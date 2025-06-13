@@ -62,3 +62,9 @@ vector<string> splitByCommas(string theContainer){
     }
     return theVector;
 }
+
+string extractInvitationID(const string& line) {
+    size_t dotPos = line.find(':');
+    if (dotPos == string::npos) return "";
+    return line.substr(0, dotPos);
+}

@@ -91,5 +91,6 @@ DayOfWeek stringToDayOfWeek(const string& s);
 string periodicTypeToString(PeriodicType type);
 vector<string> splitTheOrder(string order);
 vector<string> splitByCommas(string theContainer);
+string extractInvitationID(const string& line);
 
 #endif //UTILS_H
