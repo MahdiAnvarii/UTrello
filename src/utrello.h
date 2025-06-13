@@ -18,9 +18,9 @@ public:
     void addNewTask(string dateLine, int time, string title, const string& description);
     void deleteTask(int taskID);
     void editTask(int taskID, string dateLine, int time, string title, const string& description);
-    void reportJobs(string fromDateLine, string toDateLine, string type);
+    vector<string> reportJobs(string fromDateLine, string toDateLine, string type);
     void addNewJoinEvent(string guestsLine, string dateLine, int start_time, int end_time, string title, const string& description);
-    void checkInvitationList();
+    vector<string> checkInvitationList();
     void confirmJoinEvent(int invitationID);
     void rejectJoinEvent(int invitationID);    
 private:

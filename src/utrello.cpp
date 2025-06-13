@@ -83,6 +83,10 @@ void UTrello::addNewEvent(string dateLine, int start_time, int duration, string 
 void UTrello::addNewPeriodicEvent(string startDateLine, string endDateLine, int start_time, int duration, string type, 
                                     string title, const string& description, bool& holidayFoundFlag, int day, vector<string> week_days) {
 
+    for (auto dayOfWeekForEvent : week_days){
+        if (find(DAYS_OF_WEEK.begin(), DAYS_OF_WEEK.end(), dayOfWeekForEvent) == DAYS_OF_WEEK.end()) throw BadRequest();
+    }
+
     shared_ptr<User> theUser = ifSomeOneLoggedIn();
     if (start_time > CLOCK_END || start_time < CLOCK_START || duration <= CLOCK_START ||
         find(PERIODIC_TYPE.begin(), PERIODIC_TYPE.end(), type) == PERIODIC_TYPE.end()) throw BadRequest();
@@ -119,6 +123,7 @@ void UTrello::addNewPeriodicEvent(string startDateLine, string endDateLine, int 
             potentialPeriodicEventDates.push_back(potentialDate);
             if (potentialDate->isOnAnotherDate(*eventEndDate)) break;
             potentialDate = potentialDate->createTheNextDayOfWeek(daysOfWeek);
+            if (potentialDate->isAfterDate(*eventEndDate)) break;
         }
     }
 
@@ -156,14 +161,14 @@ void UTrello::editTask(int taskID, string dateLine, int time, string title, cons
     theUser->editTask(taskID, dateLine, time, title, description);
 }
 
-void UTrello::reportJobs(string fromDateLine, string toDateLine, string type){
+vector<string> UTrello::reportJobs(string fromDateLine, string toDateLine, string type){
     shared_ptr<User> theUser = ifSomeOneLoggedIn();
     if (type != EMPTY_TYPE && find(JOB_TYPES.begin(), JOB_TYPES.end(), type) == JOB_TYPES.end()) throw BadRequest();
     shared_ptr<Date> toDate = make_shared<Date>(toDateLine);
     shared_ptr<Date> fromDate = nullptr;
     if (fromDateLine != EMPTY_DATELINE) fromDate = make_shared<Date>(fromDateLine);
     else fromDate = make_shared<Date>(1, 1, 1404, true);
-    theUser->reportJobs(fromDate, toDate, type);
+    return theUser->reportJobs(fromDate, toDate, type);
 }
 
 void UTrello::addNewJoinEvent(string guestsLine, string dateLine, int start_time, int end_time, string title, const string& description){
@@ -189,9 +194,9 @@ void UTrello::addNewJoinEvent(string guestsLine, string dateLine, int start_time
     joinEventCounter+=1;
 }
 
-void UTrello::checkInvitationList(){
+vector<string> UTrello::checkInvitationList(){
     shared_ptr<User> theUser = ifSomeOneLoggedIn();
-    theUser->checkInvitationList();
+    return theUser->checkInvitationList();
 }
 
 void UTrello::confirmJoinEvent(int invitationID){
