@@ -2,7 +2,8 @@
 ![UTrelloPic](https://drive.google.com/uc?export=view&id=10GTguiuto93vsm8TyHQNkB093Uyds2dG)
 
 ## 📝 Repository Description
-UTrello is a C++ command-line application that helps users organize tasks, events, and recurring schedules with:
+UTrello is a powerful task and event management system designed to help users organize their time effectively.
+Originally a command-line tool in C++, UTrello has evolved into a web-based application with a user-friendly interface and robust scheduling logic.
 - ✅ User authentication
 - 📅 Date/time management
 - 🔄 Support for periodic events (daily/weekly/monthly)
@@ -26,12 +27,15 @@ UTrello is a C++ command-line application that helps users organize tasks, event
   - Holiday awareness (via CSV input)
   - Date validation (30-day months, 1404+ Persian calendar support)
 
-- Rich CLI:
-
-  - Natural command syntax (e.g., POST event date 1403/05/15 start_time 9 duration 2 title "Meeting")
-  - Error handling with clear messages
-
 - Reporting: Filter jobs by date range/type
+
+## 🌐 Web Interface
+UTrello now comes with a responsive web interface for managing your schedule:
+
+- 📅 View and manage events and tasks in-browser
+- 🧭 Clean, intuitive UI for job creation and conflict resolution
+- 📊 Dashboard and reports accessible by filters
+- ⚠️ Real-time feedback on validation or scheduling conflicts
 
 ## 📥 Installation
 
@@ -42,17 +46,16 @@ make
 make run
 ```
 
-## 💻 Usage Examples
+Then open your browser and go to:
 
-```sh
-# User management
-POST signup username john password 1234
-POST login username john password 1234
-
-# Scheduling
-POST event date 1403/06/20 start_time 14 duration 2 title "Team Sync"
-POST periodic_event start_date 1403/06/01 end_date 1403/09/01 [...] type Weekly week_days Saturday,Monday
-
-# Reporting
-GET report from 1403/05/01 to 1403/06/30 type task
+```bash
+http://localhost:5000 
 ```
+
+## 👨‍💻 Example Usage
+
+- Sign up or log in from the login screen
+- Create a task or event by filling in a simple form
+- View upcoming events in the dashboard
+- Accept or reject join event invitations
+- Generate reports by selecting date range/type
